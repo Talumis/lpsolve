@@ -1,0 +1,71 @@
+
+trigger:
+- main
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  packages: '**/Talumis.LpSolver.csproj'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+name: $(BuildDefinitionName)_$(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
+
+steps:
+# Pull in the necessary packages
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '$(solution)'
+    feedsToUse: 'select'
+    vstsFeed: '10b62caf-85c8-435a-80b9-1af98fd79ae7'
+
+# Set the build number to use the current date
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+         $version = ( Get-Date -Format "yy.MM.dd" )
+         Write-Host $version
+         Write-Host "##vso[task.setvariable variable=version]$version"
+
+# First build the whole solution, including tests
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArchitecture: 'x64'
+
+# Then package what we have to package
+- task: VSBuild@1
+  inputs:
+    solution: '$(packages)'
+    msbuildArgs: '/t:pack /p:packageoutputpath=$(Build.ArtifactStagingDirectory) /p:packageversion=$(version).$(Build.BuildId)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArchitecture: 'x64'
+
+# Run the tests
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    codeCoverageEnabled: true
+
+# Push to Azure Artifacts
+- task: NuGetAuthenticate@1
+  displayName: 'NuGet Authenticate'
+  
+- task: NuGetCommand@2
+  displayName: 'NuGet push'
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: '10b62caf-85c8-435a-80b9-1af98fd79ae7'
+    publishPackageMetadata: false
