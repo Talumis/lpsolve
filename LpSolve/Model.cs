@@ -29,26 +29,36 @@ namespace Talumis.LpSolver
     public Variable this[ int index ]
       => this.variables[ index ];
 
-    public Variable AddVariable( string name )
+    public Variable AddVariable( string name, VariableType? type = null )
     {
       var variable = new Variable( variables.Count, name );
+      if( type != null )
+      {
+        variable.Type = type.Value;
+      }
+
       variables.Add( variable );
       namedVariables.Add( name, variable );
       return variable;
     }
 
-    public Variable AddVariable()
+    public Variable AddVariable( VariableType? type = null )
     {
       var variable = new Variable( variables.Count );
+      if( type != null )
+      {
+        variable.Type = type.Value;
+      }
+
       variables.Add( variable );
       return variable;
     }
 
-    public Variable[] AddVariables( int numberOfVariables )
-      => Enumerable.Range( 0, numberOfVariables ).Select( _ => AddVariable() ).ToArray();
+    public Variable[] AddVariables( int numberOfVariables, VariableType? type = null )
+      => Enumerable.Range( 0, numberOfVariables ).Select( _ => AddVariable( type ) ).ToArray();
 
     public Variable[] AddVariables( params string[] names )
-      => names.Select( AddVariable ).ToArray();
+      => names.Select( name => AddVariable( name ) ).ToArray();
 
     public Model Maximize( LinearCombination goal )
     {

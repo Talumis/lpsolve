@@ -22,7 +22,6 @@
     public override void SetVariableBounds( Variable variable, double lowerBound, double upperBound )
       => Log.Add( $"SetVariableBounds({variable}, {lowerBound}, {upperBound})" );
 
-
     protected override bool SolveModel()
     {
       this.hasSolution = true;
@@ -34,11 +33,5 @@
 
       return true;
     }
-
-    public override void VariableIsBoolean( Variable variable ) => throw new NotImplementedException();
-
-    public override void VariableIsInteger( Variable variable ) => throw new NotImplementedException();
-
-    public override void VariableIsReal( Variable variable ) => throw new NotImplementedException();
   }
 }

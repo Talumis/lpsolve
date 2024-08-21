@@ -12,6 +12,16 @@ namespace Talumis.LpSolver.Tests
   public class VariableExpressions
   {
     [TestMethod]
+    public void CanConvertConstantToLinearCombination()
+    {
+      var model = new Model();
+      model.Goal = 42.0;
+
+      Assert.IsTrue( model.Goal.IsConstant );
+      Assert.AreEqual( "42", model.Goal.ToString() );
+    }
+
+    [TestMethod]
     public void CanMultiplyByConstant()
     {
       var model = new Model();

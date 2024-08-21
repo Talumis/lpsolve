@@ -20,9 +20,6 @@ namespace Talumis.LpSolver
     Dictionary<Variable, double> Solution { get; }
 
     void AddVariable( Variable variable );
-    void VariableIsInteger( Variable variable );
-    void VariableIsReal( Variable variable );
-    void VariableIsBoolean( Variable variable );
     void SetUpperBound( Variable variable, double value );
     void SetLowerBound( Variable variable, double value );
     void SetVariableBounds( Variable variable, double lowerBound, double upperBound );

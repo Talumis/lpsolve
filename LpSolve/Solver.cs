@@ -42,12 +42,6 @@ namespace Talumis.LpSolver
     public bool Solve()
       => this.BuildModel() && this.SolveModel();
 
-    public abstract void VariableIsBoolean( Variable variable );
-
-    public abstract void VariableIsInteger( Variable variable );
-
-    public abstract void VariableIsReal( Variable variable );
-
     protected virtual bool BuildModel()
     {
       SetObjective( this.Model.Goal, this.Model.Objective );

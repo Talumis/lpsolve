@@ -1,9 +1,12 @@
 ﻿using System.Linq.Expressions;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Talumis.LpSolver
 {
   public class Variable : IEquatable<LinearCombination>
   {
+    public VariableType Type { get; set; }
+
     internal Variable( int column, string name )
       : this( column )
     {
@@ -78,6 +81,27 @@ namespace Talumis.LpSolver
     public static Constraint operator >=( Variable a, Variable b )
      => new LinearCombination( a ) >= new LinearCombination( b );
 
+    public static Constraint operator ==( Variable a, Variable b )
+      => a - b == 0.0;
+
+    public static Constraint operator ==( Variable a, LinearCombination b )
+      => b - a == 0.0;
+
+    public static Constraint operator ==( Variable a, double b )
+      => a - b == 0.0;
+
+    public static LinearCombination operator -( Variable a )
+      => -1.0 * a;
+
+    public static Constraint operator !=( Variable a, Variable b )
+      => throw new InvalidOperationException( "Not equals constraints are not supported, use two inequalities instead." );
+
+    public static Constraint operator !=( Variable a, LinearCombination b )
+      => throw new InvalidOperationException( "Not equals constraints are not supported, use two inequalities instead." );
+
+    public static Constraint operator !=( Variable a, double b )
+      => throw new InvalidOperationException( "Not equals constraints are not supported, use two inequalities instead." );
+
     internal Variable( int column )
     {
       this.Column = column;
@@ -90,6 +114,12 @@ namespace Talumis.LpSolver
     public override string ToString() => Name ?? $"x[{Column}]";
 
     public bool Equals( LinearCombination? other )
-      => ( other != null ) && other.Equals( this );
+      => ( other is not null ) && other.Equals( this );
+
+    public override bool Equals( object? obj )
+      => ReferenceEquals( this, obj );
+
+    public override int GetHashCode()
+      => HashCode.Combine( this.Column, this.Type, this.Name );
   }
 }

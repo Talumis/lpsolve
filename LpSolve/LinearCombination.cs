@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using LpSolveDotNet;
+using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace Talumis.LpSolver
 {
@@ -6,6 +8,9 @@ namespace Talumis.LpSolver
   {
     protected Dictionary<Variable, double> coefficients;
     protected double constant;
+
+    public static implicit operator LinearCombination( double constant )
+      => new LinearCombination() { coefficients = new(), constant = constant };
 
     public LinearCombination( Variable variable, double factor = 1.0 )
     {
@@ -32,6 +37,9 @@ namespace Talumis.LpSolver
     public bool IsConstant => this.coefficients.All( kvp => kvp.Value == 0.0 );
 
     public bool IsZero => this.coefficients.All( kvp => kvp.Value == 0.0 ) && ( this.constant == 0.0 );
+
+    public static LinearCombination operator -( LinearCombination a )
+      => -1.0 * a;
 
     public static LinearCombination operator -( LinearCombination a, double r )
       => a + ( -r );
@@ -146,6 +154,24 @@ namespace Talumis.LpSolver
     public static Constraint operator >=( LinearCombination a, LinearCombination b )
       => new Constraint( a - b, 0.0, ComparisonOperator.GreaterThanOrEqual );
 
+    public static Constraint operator ==( LinearCombination a, double value )
+      => new Constraint( a - value, 0.0, ComparisonOperator.Equal );
+
+    public static Constraint operator ==( LinearCombination a, Variable value )
+      => a - new LinearCombination( value ) == 0.0;
+
+    public static Constraint operator ==( LinearCombination a, LinearCombination b )
+      => a - b == 0.0;
+
+    public static Constraint operator !=( LinearCombination a, double value )
+      => throw new InvalidOperationException( "Not equals constraints are not supported, use two inequalities instead." );
+
+    public static Constraint operator !=( LinearCombination a, Variable value )
+      => throw new InvalidOperationException( "Not equals constraints are not supported, use two inequalities instead." );
+
+    public static Constraint operator !=( LinearCombination a, LinearCombination value )
+      => throw new InvalidOperationException( "Not equals constraints are not supported, use two inequalities instead." );
+
     public bool Equals( LinearCombination? other )
     {
       // We are not null, so if other is null we are not the same.
@@ -251,9 +277,15 @@ namespace Talumis.LpSolver
     }
 
     public bool Equals( Variable? variable )
-      => ( variable != null )
+      => ( variable is not null )
         && ( this.constant == 0.0 )
         && ( this.HasSingleVariable )
         && this.coefficients.GetValueOrDefault( variable ) == 1.0;
+
+    public override bool Equals( object obj )
+      => Equals( obj as LinearCombination );
+
+    public override int GetHashCode()
+      => HashCode.Combine( this.coefficients, this.constant );
   }
 }

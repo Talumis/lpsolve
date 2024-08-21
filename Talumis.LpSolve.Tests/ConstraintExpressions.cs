@@ -139,6 +139,51 @@ namespace Talumis.LpSolver.Tests
       Assert.AreEqual( ComparisonOperator.LessThanOrEqual, constraint.Operator );
     }
 
+    [TestMethod]
+    public void EqualityConstraintWithConstantRhsCanBeAdded()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var y = model.AddVariable( "y" );
+      var constraint = x + y == 5;
+      Assert.AreEqual( "x + y = 5", constraint.ToString() );
+      Assert.AreEqual( 5.0, constraint.Value );
+      Assert.AreEqual( ComparisonOperator.Equal, constraint.Operator );
+    }
+
+    [TestMethod]
+    public void EqualityConstraintBetweenExpressionAndVariableCanBeAdded()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var y = model.AddVariable( "y" );
+      var constraint = x == 5 - y;
+      Assert.AreEqual( "-x - y = -5", constraint.ToString() );
+      Assert.AreEqual( -5.0, constraint.Value );
+      Assert.AreEqual( ComparisonOperator.Equal, constraint.Operator );
+    }
+
+    [TestMethod]
+    public void EqualityConstraintBetweenExpressionsCanBeAdded()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var y = model.AddVariable( "y" );
+
+      var constraint = ( 2 * x == y + 3 );
+      Assert.AreEqual( "2 * x - y = 3", constraint.ToString() );
+      Assert.AreEqual( 3.0, constraint.Value );
+      Assert.AreEqual( ComparisonOperator.Equal, constraint.Operator );
+    }
+
+    [TestMethod]
+    public void InequalityConstraintThrows()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var y = model.AddVariable( "y" );
+      Assert.ThrowsException<InvalidOperationException>( () => x + y != 5 );
+    }
 
     [TestMethod]
     public void SameConstraintsCompareTheSame()

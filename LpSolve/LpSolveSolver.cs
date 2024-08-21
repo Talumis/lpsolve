@@ -106,6 +106,27 @@ namespace Talumis.LpSolver
         EnsureAddRowMode( false );
         solver.set_col_name( variable.Column + 1, variable.Name );
       }
+
+      if( variable.Type != VariableType.NonNegative )
+      {
+        var solver = CheckSolverInitialized();
+        EnsureAddRowMode( false );
+
+        switch( variable.Type )
+        {
+          case VariableType.Real:
+            solver.set_unbounded( variable.Column + 1 );
+            break;
+          case VariableType.Integer:
+            solver.set_int( variable.Column + 1, true );
+            break;
+          case VariableType.Boolean:
+            solver.set_binary( variable.Column + 1, true );
+            break;
+          default:
+            throw new InvalidOperationException( "Unknown variable type." );
+        }
+      }
     }
 
     public override void SetLowerBound( Variable variable, double value )
@@ -161,37 +182,6 @@ namespace Talumis.LpSolver
       }
     }
 
-    public override void VariableIsBoolean( Variable variable )
-    {
-      var solver = CheckSolverInitialized();
-      EnsureAddRowMode( false );
-      if( variable.Name != null )
-      {
-        solver.set_binary( variable.Column + 1, true );
-      }
-    }
-
-    public override void VariableIsInteger( Variable variable )
-    {
-      var solver = CheckSolverInitialized();
-      EnsureAddRowMode( false );
-      if( variable.Name != null )
-      {
-        solver.set_int( variable.Column + 1, true );
-      }
-    }
-
-    public override void VariableIsReal( Variable variable )
-    {
-      var solver = CheckSolverInitialized();
-      EnsureAddRowMode( false );
-      if( variable.Name != null )
-      {
-        solver.set_binary( variable.Column + 1, false );
-        solver.set_int( variable.Column + 1, false );
-      }
-    }
-
     protected override bool BuildModel()
     {
       this.solver = LpSolve.make_lp( 0, Model.NumberOfVariables );
@@ -208,6 +198,7 @@ namespace Talumis.LpSolver
         return false;
       }
 
+      solver.print_lp();
       this.hasSolution = true;
       this.objectiveValue = solver.get_objective();
 

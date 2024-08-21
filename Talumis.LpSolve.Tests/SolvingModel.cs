@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -102,6 +103,32 @@ namespace Talumis.LpSolver.Tests
       Assert.AreEqual( 21.875, solver[ model[ "x" ] ], 1.0E-6 );
       Assert.AreEqual( 53.125, solver[ model[ "y" ] ], 1.0E-6 );
     }
+
+    [TestMethod]
+    public void LpSolveSolverSetsCorrectVariableTypes()
+    {
+      var model = new Model();
+      var real = model.AddVariable();
+      var positive = model.AddVariable( VariableType.NonNegative );
+      var integer = model.AddVariable( VariableType.Integer );
+      var boolean = model.AddVariable( VariableType.Boolean );
+
+      model.Goal = 0.0;
+
+      var solver = new LpSolveSolver( model );
+      Assert.IsTrue( solver.Solve() );
+
+      var lpSolver = GetPrivateSolver( solver );
+      Assert.IsNotNull( lpSolver, "Expected access to the internal solver." );
+      Assert.IsTrue( lpSolver.is_unbounded( real.Column + 1 ), "Expected 'real' to be unbounded." );
+      Assert.AreEqual( 0.0, lpSolver.get_lowbo( positive.Column + 1 ) );
+      Assert.IsTrue( lpSolver.is_int( integer.Column + 1 ), "Expected 'integer' to be integer." );
+      Assert.IsTrue( lpSolver.is_binary( boolean.Column + 1 ), "Expected 'boolean' to be binary." );
+    }
+
+    private LpSolveDotNet.LpSolve? GetPrivateSolver( LpSolveSolver solver )
+      => (LpSolveDotNet.LpSolve?)solver.GetType()?.GetField( "solver", BindingFlags.NonPublic | BindingFlags.Instance )?.GetValue( solver );
+
 
     private Model BuildModel()
     {

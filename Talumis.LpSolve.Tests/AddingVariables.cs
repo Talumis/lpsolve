@@ -129,5 +129,24 @@ namespace Talumis.LpSolver.Tests
       Assert.AreEqual( "x[1]", y.ToString() );
       Assert.AreEqual( "z", z.ToString() );
     }
+
+    [TestMethod]
+    public void DefaultVariableTypeIsUnboundedReal()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      Assert.AreEqual( VariableType.Real, x.Type );
+    }
+
+    [TestMethod]
+    public void CanAddVariableWithType()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x", VariableType.Integer );
+      var y = model.AddVariable( "y", VariableType.Boolean );
+
+      Assert.AreEqual( VariableType.Integer, x.Type );
+      Assert.AreEqual( VariableType.Boolean, y.Type );
+    }
   }
 }
