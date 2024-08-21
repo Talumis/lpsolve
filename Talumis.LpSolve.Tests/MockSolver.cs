@@ -2,7 +2,7 @@
 {
   internal class MockSolver( Model model ) : Solver( model )
   {
-    public List<string> Log = new();
+    public List<string> Log = [];
 
     public override void AddConstraint( Constraint constraint )
       => Log.Add( $"AddConstraint({constraint})" );

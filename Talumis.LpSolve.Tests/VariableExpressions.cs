@@ -14,8 +14,10 @@ namespace Talumis.LpSolver.Tests
     [TestMethod]
     public void CanConvertConstantToLinearCombination()
     {
-      var model = new Model();
-      model.Goal = 42.0;
+      var model = new Model
+      {
+        Goal = 42.0
+      };
 
       Assert.IsTrue( model.Goal.IsConstant );
       Assert.AreEqual( "42", model.Goal.ToString() );
@@ -91,7 +93,7 @@ namespace Talumis.LpSolver.Tests
       var model = new Model();
       var x = model.AddVariable( "x" );
       var y = model.AddVariable( "y" );
-      var expression = 3 * x + 5 * y;
+      var expression = ( 3 * x ) + ( 5 * y );
       Assert.AreEqual( "3 * x + 5 * y", expression.ToString() );
     }
 
@@ -110,13 +112,11 @@ namespace Talumis.LpSolver.Tests
     {
       var model = new Model();
       var x = model.AddVariable( "x" );
-      var three = 3 * x;
-      var two = 2 * x;
-      var res = three - two;
-      var expression = 3 * x - 2 * x;
+
+      var expression = ( 3 * x ) - ( 2 * x );
       Assert.AreEqual( "x", expression.ToString() );
 
-      var expression2 = 2 * x - 3 * x;
+      var expression2 = ( 2 * x ) - ( 3 * x );
       Assert.AreEqual( "-x", expression2.ToString() );
     }
 
@@ -171,7 +171,7 @@ namespace Talumis.LpSolver.Tests
       var model = new Model();
       var x = model.AddVariable( "x" );
       var y = model.AddVariable( "y" );
-      var expression = 3 * x + 5 * y;
+      var expression = ( 3 * x ) + ( 5 * y );
       Assert.IsFalse( expression.HasSingleVariable );
       Assert.IsFalse( expression.IsConstant );
       Assert.IsFalse( expression.IsZero );
@@ -225,7 +225,7 @@ namespace Talumis.LpSolver.Tests
     {
       var model = new Model();
       var x = model.AddVariable( "x" );
-      var expression = 3 * x + 5;
+      var expression = ( 3 * x ) + 5;
       Assert.AreEqual( "3 * x + 5", expression.ToString() );
       Assert.IsFalse( expression.IsConstant );
       Assert.IsFalse( expression.IsZero );
@@ -236,7 +236,7 @@ namespace Talumis.LpSolver.Tests
     {
       var model = new Model();
       var x = model.AddVariable( "x" );
-      var expression = -2 + 3 * x + 5;
+      var expression = -2 + ( 3 * x ) + 5;
       Assert.AreEqual( "3 * x + 3", expression.ToString() );
       Assert.IsFalse( expression.IsConstant );
       Assert.IsFalse( expression.IsZero );
@@ -247,7 +247,7 @@ namespace Talumis.LpSolver.Tests
     {
       var model = new Model();
       var x = model.AddVariable( "x" );
-      var expression = 3 * x + 5 - x - 5;
+      var expression = ( 3 * x ) + 5 - x - 5;
       Assert.AreEqual( "2 * x", expression.ToString() );
       Assert.IsFalse( expression.IsConstant );
       Assert.IsFalse( expression.IsZero );
@@ -258,7 +258,7 @@ namespace Talumis.LpSolver.Tests
     {
       var model = new Model();
       var x = model.AddVariable( "x" );
-      var expression = 3 * x + 5 - 3 * x - 5;
+      var expression = ( 3 * x ) + 5 - ( 3 * x ) - 5;
       Assert.AreEqual( "0", expression.ToString() );
       Assert.IsTrue( expression.IsConstant );
       Assert.IsTrue( expression.IsZero );
@@ -292,8 +292,8 @@ namespace Talumis.LpSolver.Tests
       var model = new Model();
       var x = model.AddVariable( "x" );
       var y = model.AddVariable( "y" );
-      var expression1 = 3 * x + 4 * y + 5;
-      var expression2 = 4 * y + 5 - ( -3 ) * x;
+      var expression1 = ( 3 * x ) + ( 4 * y ) + 5;
+      var expression2 = ( 4 * y ) + 5 - ( ( -3 ) * x );
       Assert.AreEqual( "3 * x + 4 * y + 5", expression1.ToString() );
       Assert.AreEqual( "3 * x + 4 * y + 5", expression2.ToString() );
       Assert.AreEqual( expression1, expression2 );

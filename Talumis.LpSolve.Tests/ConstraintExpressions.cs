@@ -87,7 +87,7 @@ namespace Talumis.LpSolver.Tests
     {
       var model = new Model();
       model.AddVariables( "x", "y" );
-      var constraint = 3 * model[ "x" ] + 5 * model[ "y" ] <= 10;
+      var constraint = ( 3 * model[ "x" ] ) + ( 5 * model[ "y" ] ) <= 10;
       Assert.AreEqual( "3 * x + 5 * y <= 10", constraint.ToString() );
       Assert.AreEqual( 10.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.LessThanOrEqual, constraint.Operator );
@@ -98,7 +98,7 @@ namespace Talumis.LpSolver.Tests
     {
       var model = new Model();
       model.AddVariables( "x", "y" );
-      var constraint = 5 >= 4 * model[ "x" ] + 2 * model[ "y" ];
+      var constraint = 5 >= ( 4 * model[ "x" ] ) + ( 2 * model[ "y" ] );
       Assert.AreEqual( "4 * x + 2 * y <= 5", constraint.ToString() );
       Assert.AreEqual( 5.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.LessThanOrEqual, constraint.Operator );
@@ -109,7 +109,7 @@ namespace Talumis.LpSolver.Tests
     {
       var model = new Model();
       model.AddVariables( "x", "y" );
-      var constraint = 3 * model[ "x" ] + 5 * model[ "y" ] <= 4 * model[ "x" ] + 2 * model[ "y" ];
+      var constraint = ( 3 * model[ "x" ] ) + ( 5 * model[ "y" ] ) <= ( 4 * model[ "x" ] ) + ( 2 * model[ "y" ] );
       Assert.AreEqual( "-x + 3 * y <= 0", constraint.ToString() );
       Assert.AreEqual( 0.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.LessThanOrEqual, constraint.Operator );
@@ -133,7 +133,7 @@ namespace Talumis.LpSolver.Tests
     {
       var model = new Model();
       model.AddVariables( "x", "y" );
-      var constraint = 3 * model[ "x" ] + 5 * model[ "y" ] - 6 <= 4 * model[ "x" ] + 2 * model[ "y" ] + 1;
+      var constraint = ( 3 * model[ "x" ] ) + ( 5 * model[ "y" ] ) - 6 <= ( 4 * model[ "x" ] ) + ( 2 * model[ "y" ] ) + 1;
       Assert.AreEqual( "-x + 3 * y <= 7", constraint.ToString() );
       Assert.AreEqual( 7.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.LessThanOrEqual, constraint.Operator );
@@ -170,7 +170,7 @@ namespace Talumis.LpSolver.Tests
       var x = model.AddVariable( "x" );
       var y = model.AddVariable( "y" );
 
-      var constraint = ( 2 * x == y + 3 );
+      var constraint = 2 * x == y + 3;
       Assert.AreEqual( "2 * x - y = 3", constraint.ToString() );
       Assert.AreEqual( 3.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.Equal, constraint.Operator );
@@ -191,8 +191,8 @@ namespace Talumis.LpSolver.Tests
       var model = new Model();
       var x = model.AddVariable( "x" );
       var y = model.AddVariable( "y" );
-      var constraint1 = 3 * x + 4 * y + 5 <= 3;
-      var constraint2 = 1 >= 4 * y - 2 + 5 - ( -3 ) * x;
+      var constraint1 = ( 3 * x ) + ( 4 * y ) + 5 <= 3;
+      var constraint2 = 1 >= ( 4 * y ) - 2 + 5 - ( ( -3 ) * x );
 
       Assert.AreEqual( "3 * x + 4 * y <= -2", constraint1.ToString() );
       Assert.AreEqual( "3 * x + 4 * y <= -2", constraint2.ToString() );

@@ -205,7 +205,7 @@ namespace Talumis.LpSolver
       var values = new double[ this.Model.NumberOfVariables ];
       solver.get_variables( values );
 
-      this.solution = new();
+      this.solution = [];
       foreach( var variable in this.Model.Variables )
       {
         this.solution.Add( variable, values[ variable.Column ] );

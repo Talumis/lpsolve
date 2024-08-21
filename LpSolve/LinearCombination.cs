@@ -10,7 +10,7 @@ namespace Talumis.LpSolver
     protected double constant;
 
     public static implicit operator LinearCombination( double constant )
-      => new LinearCombination() { coefficients = new(), constant = constant };
+      => new() { coefficients = [], constant = constant };
 
     public LinearCombination( Variable variable, double factor = 1.0 )
     {
@@ -25,7 +25,7 @@ namespace Talumis.LpSolver
 
     protected LinearCombination()
     {
-      this.coefficients = new();
+      this.coefficients = [];
     }
 
     public IReadOnlyDictionary<Variable, double> Coefficients => this.coefficients;
@@ -63,8 +63,8 @@ namespace Talumis.LpSolver
         return a;
       }
 
-      var result = new LinearCombination();
-      result.constant = r * a.constant;
+      var result = new LinearCombination { constant = r * a.constant };
+
       foreach( var (variable, coefficient) in a.coefficients )
       {
         result.Add( variable, r * coefficient );
@@ -77,7 +77,7 @@ namespace Talumis.LpSolver
       => r * a;
 
     public static LinearCombination operator /( LinearCombination variable, double r )
-      => ( 1.0 / r ) * variable;
+      => 1.0 / r * variable;
 
     public static LinearCombination operator +( LinearCombination a, Variable b )
       => a + new LinearCombination( b );
@@ -103,8 +103,10 @@ namespace Talumis.LpSolver
 
     public static LinearCombination operator +( LinearCombination a, LinearCombination b )
     {
-      var result = new LinearCombination();
-      result.constant = a.constant + b.constant;
+      var result = new LinearCombination
+      {
+        constant = a.constant + b.constant
+      };
       foreach( var (variable, coefficient) in a.coefficients )
       {
         result.Add( variable, coefficient );
@@ -119,43 +121,43 @@ namespace Talumis.LpSolver
     }
 
     public static Constraint operator <( LinearCombination expression, double value )
-      => new Constraint( expression, value, ComparisonOperator.LessThan );
+      => new( expression, value, ComparisonOperator.LessThan );
 
     public static Constraint operator <( double value, LinearCombination expression )
-      => new Constraint( expression, value, ComparisonOperator.GreaterThan );
+      => new( expression, value, ComparisonOperator.GreaterThan );
 
     public static Constraint operator <( LinearCombination a, LinearCombination b )
-      => new Constraint( a - b, 0.0, ComparisonOperator.LessThan );
+      => new( a - b, 0.0, ComparisonOperator.LessThan );
 
     public static Constraint operator <=( LinearCombination expression, double value )
-      => new Constraint( expression, value, ComparisonOperator.LessThanOrEqual );
+      => new( expression, value, ComparisonOperator.LessThanOrEqual );
 
     public static Constraint operator <=( double value, LinearCombination expression )
-      => new Constraint( expression, value, ComparisonOperator.GreaterThanOrEqual );
+      => new( expression, value, ComparisonOperator.GreaterThanOrEqual );
 
     public static Constraint operator <=( LinearCombination a, LinearCombination b )
-      => new Constraint( a - b, 0.0, ComparisonOperator.LessThanOrEqual );
+      => new( a - b, 0.0, ComparisonOperator.LessThanOrEqual );
 
     public static Constraint operator >( LinearCombination expression, double value )
-      => new Constraint( expression, value, ComparisonOperator.GreaterThan );
+      => new( expression, value, ComparisonOperator.GreaterThan );
 
     public static Constraint operator >( double value, LinearCombination expression )
-      => new Constraint( expression, value, ComparisonOperator.LessThan );
+      => new( expression, value, ComparisonOperator.LessThan );
 
     public static Constraint operator >( LinearCombination a, LinearCombination b )
-      => new Constraint( a - b, 0.0, ComparisonOperator.GreaterThan );
+      => new( a - b, 0.0, ComparisonOperator.GreaterThan );
 
     public static Constraint operator >=( LinearCombination expression, double value )
-      => new Constraint( expression, value, ComparisonOperator.GreaterThanOrEqual );
+      => new( expression, value, ComparisonOperator.GreaterThanOrEqual );
 
     public static Constraint operator >=( double value, LinearCombination expression )
-      => new Constraint( expression, value, ComparisonOperator.LessThanOrEqual );
+      => new( expression, value, ComparisonOperator.LessThanOrEqual );
 
     public static Constraint operator >=( LinearCombination a, LinearCombination b )
-      => new Constraint( a - b, 0.0, ComparisonOperator.GreaterThanOrEqual );
+      => new( a - b, 0.0, ComparisonOperator.GreaterThanOrEqual );
 
     public static Constraint operator ==( LinearCombination a, double value )
-      => new Constraint( a - value, 0.0, ComparisonOperator.Equal );
+      => new( a - value, 0.0, ComparisonOperator.Equal );
 
     public static Constraint operator ==( LinearCombination a, Variable value )
       => a - new LinearCombination( value ) == 0.0;
@@ -175,7 +177,7 @@ namespace Talumis.LpSolver
     public bool Equals( LinearCombination? other )
     {
       // We are not null, so if other is null we are not the same.
-      if( ReferenceEquals( null, other ) )
+      if( other is null )
       {
         return false;
       }
@@ -227,7 +229,7 @@ namespace Talumis.LpSolver
         {
           if( coefficient < 0 )
           {
-            sb.Append( "-" );
+            sb.Append( '-' );
           }
         }
         else
@@ -279,10 +281,10 @@ namespace Talumis.LpSolver
     public bool Equals( Variable? variable )
       => ( variable is not null )
         && ( this.constant == 0.0 )
-        && ( this.HasSingleVariable )
+        && this.HasSingleVariable
         && this.coefficients.GetValueOrDefault( variable ) == 1.0;
 
-    public override bool Equals( object obj )
+    public override bool Equals( object? obj )
       => Equals( obj as LinearCombination );
 
     public override int GetHashCode()

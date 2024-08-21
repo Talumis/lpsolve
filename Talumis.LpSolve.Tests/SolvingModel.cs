@@ -13,7 +13,7 @@ namespace Talumis.LpSolver.Tests
     [TestMethod]
     public void AccessingSolutionWithoutSolvingThrowsException()
     {
-      var model = BuildModel();
+      var model = DefaultModel;
       MockSolver solver = new( model );
 
       Assert.ThrowsException<InvalidOperationException>( () => solver.ObjectiveValue );
@@ -23,7 +23,7 @@ namespace Talumis.LpSolver.Tests
     [TestMethod]
     public void CanBuildDemoModel()
     {
-      var model = BuildModel();
+      var model = DefaultModel;
 
       Assert.AreEqual( 2, model.NumberOfVariables );
       Assert.AreEqual( 5, model.NumberOfConstraints );
@@ -36,7 +36,7 @@ namespace Talumis.LpSolver.Tests
     [TestMethod]
     public void SolverSetsObjective()
     {
-      var model = BuildModel();
+      var model = DefaultModel;
       var solver = new MockSolver( model );
 
       Assert.IsTrue( solver.Solve() );
@@ -46,7 +46,7 @@ namespace Talumis.LpSolver.Tests
     [TestMethod]
     public void SolverSetsConstraints()
     {
-      var model = BuildModel();
+      var model = DefaultModel;
       var solver = new MockSolver( model );
 
       Assert.IsTrue( solver.Solve() );
@@ -82,7 +82,7 @@ namespace Talumis.LpSolver.Tests
     [TestMethod]
     public void SolveModel()
     {
-      var model = BuildModel();
+      var model = DefaultModel;
       MockSolver solver = new( model );
 
       Assert.AreEqual( model, solver.Model );
@@ -95,13 +95,24 @@ namespace Talumis.LpSolver.Tests
     [TestMethod]
     public void SolveWithLpSolveSolver()
     {
-      var model = BuildModel();
+      var model = DefaultModel;
       var solver = new LpSolveSolver( model );
 
       Assert.IsTrue( solver.Solve() );
       Assert.AreEqual( 6315.625, solver.ObjectiveValue );
       Assert.AreEqual( 21.875, solver[ model[ "x" ] ], 1.0E-6 );
       Assert.AreEqual( 53.125, solver[ model[ "y" ] ], 1.0E-6 );
+    }
+
+    [TestMethod]
+    public void GoalDefaultsToZeroConstant()
+    {
+      var model = new Model();
+      model.AddVariables( "x", "y" );
+      var solver = new MockSolver( model );
+
+      Assert.IsTrue( solver.Solve() );
+      Assert.IsTrue( solver.Log.Contains( "SetObjective(0, Minimize)" ), "Expected objective to be set to minimize: '0'" );
     }
 
     [TestMethod]
@@ -112,8 +123,6 @@ namespace Talumis.LpSolver.Tests
       var positive = model.AddVariable( VariableType.NonNegative );
       var integer = model.AddVariable( VariableType.Integer );
       var boolean = model.AddVariable( VariableType.Boolean );
-
-      model.Goal = 0.0;
 
       var solver = new LpSolveSolver( model );
       Assert.IsTrue( solver.Solve() );
@@ -126,33 +135,27 @@ namespace Talumis.LpSolver.Tests
       Assert.IsTrue( lpSolver.is_binary( boolean.Column + 1 ), "Expected 'boolean' to be binary." );
     }
 
-    private LpSolveDotNet.LpSolve? GetPrivateSolver( LpSolveSolver solver )
+    private static LpSolveDotNet.LpSolve? GetPrivateSolver( LpSolveSolver solver )
       => (LpSolveDotNet.LpSolve?)solver.GetType()?.GetField( "solver", BindingFlags.NonPublic | BindingFlags.Instance )?.GetValue( solver );
 
 
-    private Model BuildModel()
+    private static Model DefaultModel
     {
-      /*
-       max(143x + 60y)
-       s.t.
-        120x + 210y <= 15000
-        110x + 30y <= 4000
-        x + y <= 75
-        x >= 0
-        y >= 0
-      */
-      var model = new Model();
-      var x = model.AddVariable( "x" );
-      var y = model.AddVariable( "y" );
+      get
+      {
+        var model = new Model();
+        var x = model.AddVariable( "x" );
+        var y = model.AddVariable( "y" );
 
-      return model.Maximize( 143 * x + 60 * y )
-        .SuchThat(
-          120 * x + 210 * y <= 15000,
-          110 * x + 30 * y <= 4000,
-          x + y <= 75,
-          x >= 0,
-          y >= 0
-        );
+        return model.Maximize( ( 143 * x ) + ( 60 * y ) )
+          .SuchThat(
+            ( 120 * x ) + ( 210 * y ) <= 15000,
+            ( 110 * x ) + ( 30 * y ) <= 4000,
+            x + y <= 75,
+            x >= 0,
+            y >= 0
+          );
+      }
     }
   }
 }

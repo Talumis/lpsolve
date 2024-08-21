@@ -12,7 +12,7 @@ namespace Talumis.LpSolver
   {
     protected bool hasSolution;
     protected double objectiveValue;
-    protected Dictionary<Variable, double> solution;
+    protected Dictionary<Variable, double> solution = [];
 
     public Model Model { get; } = model;
 
@@ -44,7 +44,7 @@ namespace Talumis.LpSolver
 
     protected virtual bool BuildModel()
     {
-      SetObjective( this.Model.Goal, this.Model.Objective );
+      SetObjective( this.Model.Goal ?? 0.0, this.Model.Objective );
 
       foreach( var variable in Model.Variables )
       {

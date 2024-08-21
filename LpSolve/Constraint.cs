@@ -21,7 +21,7 @@ namespace Talumis.LpSolver
     public bool Equals( Constraint? other )
     {
       // We are not null, so if other is null we are not the same.
-      if( ReferenceEquals( null, other ) )
+      if( other is null )
       {
         return false;
       }
@@ -40,5 +40,11 @@ namespace Talumis.LpSolver
 
     public override string ToString()
       => $"{Expression} {Operator.Symbol()} {Value}";
+
+    public override bool Equals( object? obj )
+      => Equals( obj as Constraint );
+
+    public override int GetHashCode()
+      => HashCode.Combine( Expression, Value, Operator );
   }
 }

@@ -1,11 +1,12 @@
 ﻿using LpSolveDotNet;
+using System.Diagnostics.CodeAnalysis;
 using Talumis.LpSolver;
 
 namespace Test
 {
   internal class Program
   {
-    static void Main( string[] args )
+    static void Main()
     {
       var model = new Model();
       var x = model.AddVariable( "x" );
@@ -14,14 +15,14 @@ namespace Test
       var Z = model.AddVariable( "Z" );
 
       model
-        .Maximize( 143 * x + 60 * y )
+        .Maximize( ( 143 * x ) + ( 60 * y ) )
         .SuchThat(
-          120 * x + 210 * y <= 15000,
-          110 * x + 30 * y <= 4000,
+          ( 120 * x ) + ( 210 * y ) <= 15000,
+          ( 110 * x ) + ( 30 * y ) <= 4000,
           x + y <= 75,
           x >= 0,
           y >= 0,
-          z == 143 * x + 60 * y,
+          z == ( 143 * x ) + ( 60 * y ),
           z == -Z
         );
 

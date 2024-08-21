@@ -11,17 +11,16 @@ namespace Talumis.LpSolver
 
   public class Model
   {
-    private List<Constraint> constraints = new();
-    private Dictionary<string, Variable> namedVariables = new();
-    private List<Variable> variables = new();
+    private readonly List<Constraint> constraints = [];
+    private readonly Dictionary<string, Variable> namedVariables = [];
+    private readonly List<Variable> variables = [];
 
-    public LinearCombination? Goal { get; set; } = default!;
-    public Objective Objective { get; set; }
-    public int NumberOfVariables => this.variables.Count;
-    public int NumberOfConstraints => this.constraints.Count;
     public IReadOnlyList<Constraint> Constraints => this.constraints;
+    public LinearCombination? Goal { get; set; }
+    public int NumberOfConstraints => this.constraints.Count;
+    public int NumberOfVariables => this.variables.Count;
+    public Objective Objective { get; set; }
     public IReadOnlyList<Variable> Variables => this.variables;
-
 
     public Variable this[ string name ]
       => this.namedVariables[ name ];
