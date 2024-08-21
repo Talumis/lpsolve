@@ -11,6 +11,16 @@ namespace Talumis.LpSolver.Tests
   public class AddingVariables
   {
     [TestMethod]
+    public void VariablesGetZeroBasedColumnIndex()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var y = model.AddVariable( "y" );
+      Assert.AreEqual( 0, x.Column );
+      Assert.AreEqual( 1, y.Column );
+    }
+
+    [TestMethod]
     public void CanAddVariables()
     {
       var model = new Model();
@@ -112,10 +122,12 @@ namespace Talumis.LpSolver.Tests
     public void ToStringReturnsVariableName()
     {
       var model = new Model();
-      var x = model.AddVariable( "x" );
+      var x = model.AddVariable();
       var y = model.AddVariable();
-      Assert.AreEqual( "x", x.ToString() );
-      Assert.AreEqual( "x[2]", y.ToString() );
+      var z = model.AddVariable( "z" );
+      Assert.AreEqual( "x[0]", x.ToString() );
+      Assert.AreEqual( "x[1]", y.ToString() );
+      Assert.AreEqual( "z", z.ToString() );
     }
   }
 }

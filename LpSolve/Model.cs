@@ -31,7 +31,7 @@ namespace Talumis.LpSolver
 
     public Variable AddVariable( string name )
     {
-      var variable = new Variable( variables.Count + 1, name );
+      var variable = new Variable( variables.Count, name );
       variables.Add( variable );
       namedVariables.Add( name, variable );
       return variable;
@@ -39,7 +39,7 @@ namespace Talumis.LpSolver
 
     public Variable AddVariable()
     {
-      var variable = new Variable( variables.Count + 1 );
+      var variable = new Variable( variables.Count );
       variables.Add( variable );
       return variable;
     }

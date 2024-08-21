@@ -13,7 +13,7 @@ namespace Talumis.LpSolver.Tests
     public void AccessingSolutionWithoutSolvingThrowsException()
     {
       var model = BuildModel();
-      DummySolver solver = new( model );
+      MockSolver solver = new( model );
 
       Assert.ThrowsException<InvalidOperationException>( () => solver.ObjectiveValue );
       Assert.ThrowsException<InvalidOperationException>( () => solver[ model[ "x" ] ] );
@@ -36,7 +36,7 @@ namespace Talumis.LpSolver.Tests
     public void SolverSetsObjective()
     {
       var model = BuildModel();
-      var solver = new DummySolver( model );
+      var solver = new MockSolver( model );
 
       Assert.IsTrue( solver.Solve() );
       Assert.IsTrue( solver.Log.Contains( "SetObjective(143 * x + 60 * y, Maximize)" ), "Expected call to AddObjective." );
@@ -46,7 +46,7 @@ namespace Talumis.LpSolver.Tests
     public void SolverSetsConstraints()
     {
       var model = BuildModel();
-      var solver = new DummySolver( model );
+      var solver = new MockSolver( model );
 
       Assert.IsTrue( solver.Solve() );
       Assert.IsTrue( solver.Log.Contains( "AddConstraint(120 * x + 210 * y <= 15000)" ), "Expected call to AddConstraint." );
@@ -57,19 +57,32 @@ namespace Talumis.LpSolver.Tests
     [TestMethod]
     public void SolverConvertsConstraintsToVariableBounds()
     {
-      var model = BuildModel();
-      var solver = new DummySolver( model );
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var y = model.AddVariable( "y" );
+      var z = model.AddVariable( "z" );
+
+      model.SuchThat(
+        x >= 0,
+        y > 5,
+        y <= 10,
+        5 * z >= 10
+      );
+
+      var solver = new MockSolver( model );
 
       Assert.IsTrue( solver.Solve() );
       Assert.IsTrue( solver.Log.Contains( "SetLowerBound(x, 0)" ), "Expected call to SetLowerBound for x." );
-      Assert.IsTrue( solver.Log.Contains( "SetLowerBound(y, 0)" ), "Expected call to SetLowerBound for y." );
+      Assert.IsTrue( solver.Log.Contains( "SetLowerBound(y, 5)" ), "Expected call to SetLowerBound for y." );
+      Assert.IsTrue( solver.Log.Contains( "SetUpperBound(y, 10)" ), "Expected call to SetUpperBound for y." );
+      Assert.IsTrue( solver.Log.Contains( "SetLowerBound(z, 2)" ), "Expected call to SetLowerBound for x." );
     }
 
     [TestMethod]
     public void SolveModel()
     {
       var model = BuildModel();
-      DummySolver solver = new( model );
+      MockSolver solver = new( model );
 
       Assert.AreEqual( model, solver.Model );
       Assert.IsTrue( solver.Solve() );
@@ -85,7 +98,7 @@ namespace Talumis.LpSolver.Tests
       var solver = new LpSolveSolver( model );
 
       Assert.IsTrue( solver.Solve() );
-      Assert.AreEqual( 6326.625, solver.ObjectiveValue );
+      Assert.AreEqual( 6315.625, solver.ObjectiveValue );
       Assert.AreEqual( 21.875, solver[ model[ "x" ] ], 1.0E-6 );
       Assert.AreEqual( 53.125, solver[ model[ "y" ] ], 1.0E-6 );
     }
@@ -114,47 +127,5 @@ namespace Talumis.LpSolver.Tests
           y >= 0
         );
     }
-  }
-
-  internal class DummySolver( Model model ) : Solver( model )
-  {
-    public List<string> Log = new();
-
-    public override void AddConstraint( Constraint constraint )
-      => Log.Add( $"AddConstraint({constraint})" );
-
-    public override void AddVariable( Variable variable )
-      => Log.Add( $"AddVariable({variable})" );
-
-    public override void SetLowerBound( Variable variable, double value )
-      => Log.Add( $"SetLowerBound({variable}, {value})" );
-
-    public override void SetObjective( LinearCombination linearCombination, Objective objective = Objective.Minimize )
-      => Log.Add( $"SetObjective({linearCombination}, {objective})" );
-
-    public override void SetUpperBound( Variable variable, double value )
-      => Log.Add( $"SetUpperBound({variable}, {value})" );
-
-    public override void SetVariableBounds( Variable variable, double lowerBound, double upperBound )
-      => Log.Add( $"SetVariableBounds({variable}, {lowerBound}, {upperBound})" );
-
-
-    protected override bool SolveModel()
-    {
-      this.hasSolution = true;
-      this.objectiveValue = 6326.625;
-      this.solution = new Dictionary<Variable, double> {
-        { this.Model[ "x" ], 21.875 },
-        { this.Model[ "y" ], 53.125 }
-      };
-
-      return true;
-    }
-
-    public override void VariableIsBoolean( Variable variable ) => throw new NotImplementedException();
-
-    public override void VariableIsInteger( Variable variable ) => throw new NotImplementedException();
-
-    public override void VariableIsReal( Variable variable ) => throw new NotImplementedException();
   }
 }

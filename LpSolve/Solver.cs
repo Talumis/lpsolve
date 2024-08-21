@@ -14,9 +14,6 @@ namespace Talumis.LpSolver
     protected double objectiveValue;
     protected Dictionary<Variable, double> solution;
 
-    public double this[ Variable variable ]
-      => this.hasSolution ? solution[ variable ] : throw new InvalidOperationException( "Cannot access the solution before the solver has run." );
-
     public Model Model { get; } = model;
 
     public double ObjectiveValue
@@ -27,15 +24,29 @@ namespace Talumis.LpSolver
       ? this.solution
       : throw new InvalidOperationException( "Cannot access the solution before the solver has run." );
 
+    public double this[ Variable variable ]
+                  => this.hasSolution ? solution[ variable ] : throw new InvalidOperationException( "Cannot access the solution before the solver has run." );
+
     public abstract void AddConstraint( Constraint constraint );
+
     public abstract void AddVariable( Variable variable );
+
     public abstract void SetLowerBound( Variable variable, double value );
+
     public abstract void SetObjective( LinearCombination linearCombination, Objective objective = Objective.Minimize );
+
     public abstract void SetUpperBound( Variable variable, double value );
+
     public abstract void SetVariableBounds( Variable variable, double lowerBound, double upperBound );
 
     public bool Solve()
       => this.BuildModel() && this.SolveModel();
+
+    public abstract void VariableIsBoolean( Variable variable );
+
+    public abstract void VariableIsInteger( Variable variable );
+
+    public abstract void VariableIsReal( Variable variable );
 
     protected virtual bool BuildModel()
     {
@@ -50,14 +61,19 @@ namespace Talumis.LpSolver
       {
         if( constraint.Expression.HasSingleVariable )
         {
-          var variable = constraint.Expression.Coefficients.SingleOrDefault( kvp => kvp.Value != 0 ).Key;
+          (var variable, var coefficient) = constraint.Expression.Coefficients.SingleOrDefault( kvp => kvp.Value != 0 );
+          if( coefficient == 0 )
+          {
+            throw new InvalidOperationException( "Cannot put a constraint in the model that has a zero coefficient for the single variable." );
+          }
+
           if( ( constraint.Operator == ComparisonOperator.LessThan ) || ( constraint.Operator == ComparisonOperator.LessThanOrEqual ) )
           {
-            SetUpperBound( variable, constraint.Expression.Constant );
+            SetUpperBound( variable, constraint.Value / coefficient );
           }
           else if( ( constraint.Operator == ComparisonOperator.GreaterThan ) || ( constraint.Operator == ComparisonOperator.GreaterThanOrEqual ) )
           {
-            SetLowerBound( variable, constraint.Expression.Constant );
+            SetLowerBound( variable, constraint.Value / coefficient );
           }
         }
         else
@@ -70,9 +86,5 @@ namespace Talumis.LpSolver
     }
 
     protected abstract bool SolveModel();
-
-    public abstract void VariableIsBoolean( Variable variable );
-    public abstract void VariableIsInteger( Variable variable );
-    public abstract void VariableIsReal( Variable variable );
   }
 }
