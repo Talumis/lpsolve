@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -128,6 +129,163 @@ namespace Talumis.LpSolver.Tests
       var x = model.AddVariable( "x" );
       var expression = 6 * x / 2;
       Assert.AreEqual( "3 * x", expression.ToString() );
+      Assert.IsFalse( expression.IsConstant );
+      Assert.IsFalse( expression.IsZero );
+    }
+
+    [TestMethod]
+    public void SingleVariableIsSingleVariable()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      Assert.IsTrue( x.HasSingleVariable );
+      Assert.IsFalse( x.IsConstant );
+      Assert.IsFalse( x.IsZero );
+    }
+
+    [TestMethod]
+    public void MultipleOfSingleVariableIsSingleVariable()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = 3 * x;
+      Assert.IsTrue( expression.HasSingleVariable );
+      Assert.IsFalse( expression.IsConstant );
+      Assert.IsFalse( expression.IsZero );
+    }
+
+    [TestMethod]
+    public void SumOfSingleVariablesIsNotSingleVariable()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var y = model.AddVariable( "y" );
+      var expression = 3 * x + 5 * y;
+      Assert.IsFalse( expression.HasSingleVariable );
+      Assert.IsFalse( expression.IsConstant );
+      Assert.IsFalse( expression.IsZero );
+    }
+
+    [TestMethod]
+    public void ZeroTimesXIsZero()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = 0 * x;
+      Assert.IsTrue( expression.IsZero );
+      Assert.IsTrue( expression.IsConstant );
+    }
+
+    [TestMethod]
+    public void XMinusXIsZero()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = x - x;
+      Assert.IsTrue( expression.IsConstant );
+      Assert.IsTrue( expression.IsZero );
+    }
+
+    [TestMethod]
+    public void PositiveConstantWithoutTerms()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = x - x + 5;
+      Assert.AreEqual( "5", expression.ToString() );
+      Assert.IsTrue( expression.IsConstant );
+      Assert.IsFalse( expression.IsZero );
+    }
+
+
+    [TestMethod]
+    public void NegativeConstantWithoutTerms()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = x - x - 5;
+      Assert.AreEqual( "-5", expression.ToString() );
+      Assert.IsTrue( expression.IsConstant );
+      Assert.IsFalse( expression.IsZero );
+    }
+
+    [TestMethod]
+    public void CanAddConstantToLinearCombination()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = 3 * x + 5;
+      Assert.AreEqual( "3 * x + 5", expression.ToString() );
+      Assert.IsFalse( expression.IsConstant );
+      Assert.IsFalse( expression.IsZero );
+    }
+
+    [TestMethod]
+    public void CanSubtractConstant()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = -2 + 3 * x + 5;
+      Assert.AreEqual( "3 * x + 3", expression.ToString() );
+      Assert.IsFalse( expression.IsConstant );
+      Assert.IsFalse( expression.IsZero );
+    }
+
+    [TestMethod]
+    public void CanSubtractConstantToZero()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = 3 * x + 5 - x - 5;
+      Assert.AreEqual( "2 * x", expression.ToString() );
+      Assert.IsFalse( expression.IsConstant );
+      Assert.IsFalse( expression.IsZero );
+    }
+
+    [TestMethod]
+    public void CanSubtractEverythingToZero()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = 3 * x + 5 - 3 * x - 5;
+      Assert.AreEqual( "0", expression.ToString() );
+      Assert.IsTrue( expression.IsConstant );
+      Assert.IsTrue( expression.IsZero );
+    }
+
+    [TestMethod]
+    public void ConstantIsMultipliedByCoefficient()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = 3 * ( 5 + x );
+      Assert.AreEqual( "3 * x + 15", expression.ToString() );
+    }
+
+    [TestMethod]
+    public void OperationWithZeroIsOptimizedAway()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = 3 * x;
+
+      Assert.AreSame( expression, expression + 0.0 );
+      Assert.AreSame( expression, expression - 0.0 );
+      Assert.AreNotSame( expression, expression + 1.0 );
+    }
+
+
+    [TestMethod]
+    public void EqualExpressionCompareEqual()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var y = model.AddVariable( "y" );
+      var expression1 = 3 * x + 4 * y + 5;
+      var expression2 = 4 * y + 5 - ( -3 ) * x;
+      Assert.AreEqual( "3 * x + 4 * y + 5", expression1.ToString() );
+      Assert.AreEqual( "3 * x + 4 * y + 5", expression2.ToString() );
+      Assert.AreEqual( expression1, expression2 );
     }
 
   }
