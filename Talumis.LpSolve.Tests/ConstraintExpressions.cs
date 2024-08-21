@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Talumis.LpSolver.Tests
+﻿namespace Talumis.LpSolver.Tests
 {
   [TestClass]
   public class ConstraintExpressions
@@ -127,7 +120,6 @@ namespace Talumis.LpSolver.Tests
       Assert.AreEqual( ComparisonOperator.LessThan, constraint.Operator );
     }
 
-
     [TestMethod]
     public void LinearCombinationOnBothSidesWithConstants()
     {
@@ -198,6 +190,5 @@ namespace Talumis.LpSolver.Tests
       Assert.AreEqual( "3 * x + 4 * y <= -2", constraint2.ToString() );
       Assert.AreEqual( constraint1, constraint2 );
     }
-
   }
 }

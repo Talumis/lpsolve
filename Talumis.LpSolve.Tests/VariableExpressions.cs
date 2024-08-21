@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Talumis.LpSolver.Tests
+﻿namespace Talumis.LpSolver.Tests
 {
   [TestClass]
   public class VariableExpressions
@@ -58,7 +50,6 @@ namespace Talumis.LpSolver.Tests
       var expression = -1.0 * x;
       Assert.AreEqual( "-x", expression.ToString() );
     }
-
 
     [TestMethod]
     public void CanDivideByConstant()
@@ -135,7 +126,6 @@ namespace Talumis.LpSolver.Tests
     [TestMethod]
     public void SixByTwoIsThree()
     {
-
       var model = new Model();
       var x = model.AddVariable( "x" );
       var expression = 6 * x / 2;
@@ -207,7 +197,6 @@ namespace Talumis.LpSolver.Tests
       Assert.IsTrue( expression.IsConstant );
       Assert.IsFalse( expression.IsZero );
     }
-
 
     [TestMethod]
     public void NegativeConstantWithoutTerms()
@@ -285,7 +274,6 @@ namespace Talumis.LpSolver.Tests
       Assert.AreNotSame( expression, expression + 1.0 );
     }
 
-
     [TestMethod]
     public void EqualExpressionCompareEqual()
     {
@@ -308,6 +296,5 @@ namespace Talumis.LpSolver.Tests
 
       Assert.IsTrue( x.Equals( expression ) );
     }
-
   }
 }

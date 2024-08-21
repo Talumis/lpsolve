@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata;
-
-namespace Talumis.LpSolver
+﻿namespace Talumis.LpSolver
 {
   public class Constraint : IEquatable<Constraint>
   {

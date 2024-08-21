@@ -1,7 +1,4 @@
-﻿using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
-
-namespace Talumis.LpSolver
+﻿namespace Talumis.LpSolver
 {
   public class Variable : IEquatable<LinearCombination>
   {
@@ -28,13 +25,13 @@ namespace Talumis.LpSolver
       => new LinearCombination( a ) - new LinearCombination( b );
 
     public static LinearCombination operator *( double r, Variable a )
-      => new LinearCombination( a, r );
+      => new( a, r );
 
     public static LinearCombination operator *( Variable a, double r )
-      => new LinearCombination( a, r );
+      => new( a, r );
 
     public static LinearCombination operator /( Variable variable, double r )
-      => new LinearCombination( variable, 1.0 / r );
+      => new( variable, 1.0 / r );
 
     public static LinearCombination operator +( Variable a, double r )
       => new LinearCombination( a ) + r;

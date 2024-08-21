@@ -1,12 +1,10 @@
-﻿using LpSolveDotNet;
-using System.Diagnostics.CodeAnalysis;
-using Talumis.LpSolver;
+﻿using Talumis.LpSolver;
 
 namespace Test
 {
   internal class Program
   {
-    static void Main()
+    private static void Main()
     {
       var model = new Model();
       var x = model.AddVariable( "x" );

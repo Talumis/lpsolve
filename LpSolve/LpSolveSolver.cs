@@ -1,10 +1,4 @@
 ﻿using LpSolveDotNet;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Talumis.LpSolver
 {
@@ -117,12 +111,15 @@ namespace Talumis.LpSolver
           case VariableType.Real:
             solver.set_unbounded( variable.Column + 1 );
             break;
+
           case VariableType.Integer:
             solver.set_int( variable.Column + 1, true );
             break;
+
           case VariableType.Boolean:
             solver.set_binary( variable.Column + 1, true );
             break;
+
           default:
             throw new InvalidOperationException( "Unknown variable type." );
         }

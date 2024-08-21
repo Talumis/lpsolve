@@ -1,8 +1,4 @@
-﻿using LpSolveDotNet;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-
-namespace Talumis.LpSolver
+﻿namespace Talumis.LpSolver
 {
   public enum Objective
   {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace Talumis.LpSolver.Tests
 {
@@ -137,7 +132,6 @@ namespace Talumis.LpSolver.Tests
 
     private static LpSolveDotNet.LpSolve? GetPrivateSolver( LpSolveSolver solver )
       => (LpSolveDotNet.LpSolve?)solver.GetType()?.GetField( "solver", BindingFlags.NonPublic | BindingFlags.Instance )?.GetValue( solver );
-
 
     private static Model DefaultModel
     {

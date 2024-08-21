@@ -1,6 +1,4 @@
-﻿using LpSolveDotNet;
-using System.Runtime.CompilerServices;
-using System.Text;
+﻿using System.Text;
 
 namespace Talumis.LpSolver
 {
@@ -84,7 +82,6 @@ namespace Talumis.LpSolver
 
     public static LinearCombination operator +( Variable b, LinearCombination a )
       => new LinearCombination( b ) + a;
-
 
     public static LinearCombination operator +( LinearCombination a, double r )
     {

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Talumis.LpSolver
+﻿namespace Talumis.LpSolver
 {
   public abstract class Solver( Model model ) : ISolver
   {
