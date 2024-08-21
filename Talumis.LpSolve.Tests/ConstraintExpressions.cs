@@ -16,7 +16,7 @@ namespace Talumis.LpSolver.Tests
       var model = new Model();
       var x = model.AddVariable( "x" );
       var constraint = x <= 5;
-      Assert.AreEqual( x, constraint.Expression );
+      Assert.IsTrue( x.Equals( constraint.Expression ) );
       Assert.AreEqual( 5.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.LessThanOrEqual, constraint.Operator );
       Assert.AreEqual( "x <= 5", constraint.ToString() );
@@ -28,7 +28,7 @@ namespace Talumis.LpSolver.Tests
       var model = new Model();
       var x = model.AddVariable( "x" );
       var constraint = x < -5;
-      Assert.AreEqual( x, constraint.Expression );
+      Assert.IsTrue( x.Equals( constraint.Expression ) );
       Assert.AreEqual( -5.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.LessThan, constraint.Operator );
       Assert.AreEqual( "x < -5", constraint.ToString() );
@@ -40,7 +40,7 @@ namespace Talumis.LpSolver.Tests
       var model = new Model();
       var x = model.AddVariable( "x" );
       var constraint = x >= 5;
-      Assert.AreEqual( x, constraint.Expression );
+      Assert.IsTrue( x.Equals( constraint.Expression ) );
       Assert.AreEqual( 5.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.GreaterThanOrEqual, constraint.Operator );
       Assert.AreEqual( "x >= 5", constraint.ToString() );
@@ -52,7 +52,7 @@ namespace Talumis.LpSolver.Tests
       var model = new Model();
       var x = model.AddVariable( "x" );
       var constraint = x > -5;
-      Assert.AreEqual( x, constraint.Expression );
+      Assert.IsTrue( x.Equals( constraint.Expression ) );
       Assert.AreEqual( -5.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.GreaterThan, constraint.Operator );
       Assert.AreEqual( "x > -5", constraint.ToString() );
@@ -66,7 +66,7 @@ namespace Talumis.LpSolver.Tests
       var constraint = 5 <= x;
       Assert.AreEqual( 5.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.GreaterThanOrEqual, constraint.Operator );
-      Assert.AreEqual( x, constraint.Expression );
+      Assert.IsTrue( x.Equals( constraint.Expression ) );
       Assert.AreEqual( "x >= 5", constraint.ToString() );
     }
 
@@ -78,7 +78,7 @@ namespace Talumis.LpSolver.Tests
       var constraint = 0 > x;
       Assert.AreEqual( 0.0, constraint.Value );
       Assert.AreEqual( ComparisonOperator.LessThan, constraint.Operator );
-      Assert.AreEqual( x, constraint.Expression );
+      Assert.IsTrue( x.Equals( constraint.Expression ) );
       Assert.AreEqual( "x < 0", constraint.ToString() );
     }
 

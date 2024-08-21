@@ -1,6 +1,8 @@
-﻿namespace Talumis.LpSolver
+﻿using System.Linq.Expressions;
+
+namespace Talumis.LpSolver
 {
-  public class Variable : LinearCombination
+  public class Variable : IEquatable<LinearCombination>
   {
     internal Variable( int column, string name )
       : this( column )
@@ -13,17 +15,81 @@
       this.Name = name;
     }
 
+    public static LinearCombination operator -( Variable a, double r )
+      => new LinearCombination( a ) - r;
+
+    public static LinearCombination operator -( double r, Variable a )
+      => r - new LinearCombination( a );
+
+    public static LinearCombination operator -( Variable a, Variable b )
+      => new LinearCombination( a ) - new LinearCombination( b );
+
+    public static LinearCombination operator *( double r, Variable a )
+      => new LinearCombination( a, r );
+
+    public static LinearCombination operator *( Variable a, double r )
+      => new LinearCombination( a, r );
+
+    public static LinearCombination operator /( Variable variable, double r )
+      => new LinearCombination( variable, 1.0 / r );
+
+    public static LinearCombination operator +( Variable a, double r )
+      => new LinearCombination( a ) + r;
+
+    public static LinearCombination operator +( double r, Variable a )
+      => new LinearCombination( a ) + r;
+
+    public static LinearCombination operator +( Variable a, Variable b )
+      => new LinearCombination( a ) + new LinearCombination( b );
+
+    public static Constraint operator <( Variable variable, double value )
+      => new LinearCombination( variable ) < value;
+
+    public static Constraint operator <( double value, Variable variable )
+      => value < new LinearCombination( variable );
+
+    public static Constraint operator <( Variable a, Variable b )
+      => new LinearCombination( a ) < new LinearCombination( b );
+
+    public static Constraint operator <=( Variable expression, double value )
+      => new LinearCombination( expression ) <= value;
+
+    public static Constraint operator <=( double value, Variable expression )
+      => value <= new LinearCombination( expression );
+
+    public static Constraint operator <=( Variable a, Variable b )
+      => new LinearCombination( a ) <= new LinearCombination( b );
+
+    public static Constraint operator >( Variable expression, double value )
+      => new LinearCombination( expression ) > value;
+
+    public static Constraint operator >( double value, Variable expression )
+      => value > new LinearCombination( expression );
+
+    public static Constraint operator >( Variable a, Variable b )
+      => new LinearCombination( a ) > new LinearCombination( b );
+
+    public static Constraint operator >=( Variable expression, double value )
+      => new LinearCombination( expression ) >= value;
+
+    public static Constraint operator >=( double value, Variable expression )
+      => value >= new LinearCombination( expression );
+
+    public static Constraint operator >=( Variable a, Variable b )
+     => new LinearCombination( a ) >= new LinearCombination( b );
+
     internal Variable( int column )
     {
-      base.terms.Add( this, 1.0 );
       this.Column = column;
     }
 
-    public string? Name { get; init; }
+    public string? Name { get; internal init; }
 
-    internal int Column { get; init; }
+    public int Column { get; internal init; }
 
     public override string ToString() => Name ?? $"x[{Column}]";
 
+    public bool Equals( LinearCombination? other )
+      => ( other != null ) && other.Equals( this );
   }
 }

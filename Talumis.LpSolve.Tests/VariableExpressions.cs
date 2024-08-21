@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -34,7 +35,7 @@ namespace Talumis.LpSolver.Tests
       var model = new Model();
       var x = model.AddVariable( "x" );
       var expression = 1 * x;
-      Assert.AreEqual( expression, x );
+      Assert.IsTrue( x.Equals( expression ) );
     }
 
     [TestMethod]
@@ -137,7 +138,7 @@ namespace Talumis.LpSolver.Tests
     public void SingleVariableIsSingleVariable()
     {
       var model = new Model();
-      var x = model.AddVariable( "x" );
+      var x = 1.0 * model.AddVariable( "x" );
       Assert.IsTrue( x.HasSingleVariable );
       Assert.IsFalse( x.IsConstant );
       Assert.IsFalse( x.IsZero );
@@ -286,6 +287,16 @@ namespace Talumis.LpSolver.Tests
       Assert.AreEqual( "3 * x + 4 * y + 5", expression1.ToString() );
       Assert.AreEqual( "3 * x + 4 * y + 5", expression2.ToString() );
       Assert.AreEqual( expression1, expression2 );
+    }
+
+    [TestMethod]
+    public void VariableIsEqualToUnitLinearCombination()
+    {
+      var model = new Model();
+      var x = model.AddVariable( "x" );
+      var expression = 1 * x;
+
+      Assert.IsTrue( x.Equals( expression ) );
     }
 
   }

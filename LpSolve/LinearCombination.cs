@@ -2,33 +2,51 @@
 
 namespace Talumis.LpSolver
 {
-  public class LinearCombination : IEquatable<LinearCombination>
+  public class LinearCombination : IEquatable<LinearCombination>, IEquatable<Variable>
   {
+    protected Dictionary<Variable, double> coefficients;
     protected double constant;
-    protected Dictionary<Variable, double> terms;
 
-    protected LinearCombination()
+    public LinearCombination( Variable variable, double factor = 1.0 )
     {
-      this.terms = new();
+      this.coefficients = new() { [ variable ] = factor };
     }
 
     internal LinearCombination( LinearCombination other )
     {
       this.constant = other.constant;
-      this.terms = new( other.terms );
+      this.coefficients = new( other.coefficients );
     }
 
-    public LinearCombination( Variable variable, double factor )
+    protected LinearCombination()
     {
-      this.terms = new() { [ variable ] = factor };
+      this.coefficients = new();
     }
 
-    internal LinearCombination Add( Variable variable, double coefficient )
-    {
-      this.terms.TryAdd( variable, 0.0 );
-      this.terms[ variable ] += coefficient;
-      return this;
-    }
+    public IReadOnlyDictionary<Variable, double> Coefficients => this.coefficients;
+
+    public double Constant => this.constant;
+
+    public bool HasSingleVariable => this.coefficients.Count == 1;
+
+    public bool IsConstant => this.coefficients.All( kvp => kvp.Value == 0.0 );
+
+    public bool IsZero => this.coefficients.All( kvp => kvp.Value == 0.0 ) && ( this.constant == 0.0 );
+
+    public static LinearCombination operator -( LinearCombination a, double r )
+      => a + ( -r );
+
+    public static LinearCombination operator -( double r, LinearCombination a )
+      => ( -1.0 * a ) + r;
+
+    public static LinearCombination operator -( LinearCombination a, Variable b )
+     => a - new LinearCombination( b );
+
+    public static LinearCombination operator -( Variable b, LinearCombination a )
+      => new LinearCombination( b ) - a;
+
+    public static LinearCombination operator -( LinearCombination a, LinearCombination b )
+      => a + ( -1.0 * b );
 
     public static LinearCombination operator *( double r, LinearCombination a )
     {
@@ -39,7 +57,7 @@ namespace Talumis.LpSolver
 
       var result = new LinearCombination();
       result.constant = r * a.constant;
-      foreach( var (variable, coefficient) in a.terms )
+      foreach( var (variable, coefficient) in a.coefficients )
       {
         result.Add( variable, r * coefficient );
       }
@@ -47,9 +65,18 @@ namespace Talumis.LpSolver
       return result;
     }
 
-
     public static LinearCombination operator *( LinearCombination a, double r )
       => r * a;
+
+    public static LinearCombination operator /( LinearCombination variable, double r )
+      => ( 1.0 / r ) * variable;
+
+    public static LinearCombination operator +( LinearCombination a, Variable b )
+      => a + new LinearCombination( b );
+
+    public static LinearCombination operator +( Variable b, LinearCombination a )
+      => new LinearCombination( b ) + a;
+
 
     public static LinearCombination operator +( LinearCombination a, double r )
     {
@@ -66,26 +93,16 @@ namespace Talumis.LpSolver
     public static LinearCombination operator +( double r, LinearCombination a )
       => a + r;
 
-    public static LinearCombination operator -( LinearCombination a, double r )
-      => a + ( -r );
-
-    public static LinearCombination operator -( double r, LinearCombination a )
-      => ( -1.0 * a ) + r;
-
-    public static LinearCombination operator /( LinearCombination variable, double r )
-      => ( 1.0 / r ) * variable;
-
     public static LinearCombination operator +( LinearCombination a, LinearCombination b )
     {
-
       var result = new LinearCombination();
       result.constant = a.constant + b.constant;
-      foreach( var (variable, coefficient) in a.terms )
+      foreach( var (variable, coefficient) in a.coefficients )
       {
         result.Add( variable, coefficient );
       }
 
-      foreach( var (variable, coefficient) in b.terms )
+      foreach( var (variable, coefficient) in b.coefficients )
       {
         result.Add( variable, coefficient );
       }
@@ -93,52 +110,72 @@ namespace Talumis.LpSolver
       return result;
     }
 
-    public static LinearCombination operator -( LinearCombination a, LinearCombination b )
-      => a + ( -1.0 * b );
-
-    public static Constraint operator <=( LinearCombination expression, double value )
-      => new Constraint( expression, value, ComparisonOperator.LessThanOrEqual );
-
     public static Constraint operator <( LinearCombination expression, double value )
       => new Constraint( expression, value, ComparisonOperator.LessThan );
-
-    public static Constraint operator >=( LinearCombination expression, double value )
-      => new Constraint( expression, value, ComparisonOperator.GreaterThanOrEqual );
-
-    public static Constraint operator >( LinearCombination expression, double value )
-      => new Constraint( expression, value, ComparisonOperator.GreaterThan );
-
-    public static Constraint operator <=( double value, LinearCombination expression )
-      => new Constraint( expression, value, ComparisonOperator.GreaterThanOrEqual );
 
     public static Constraint operator <( double value, LinearCombination expression )
       => new Constraint( expression, value, ComparisonOperator.GreaterThan );
 
-    public static Constraint operator >=( double value, LinearCombination expression )
+    public static Constraint operator <( LinearCombination a, LinearCombination b )
+      => new Constraint( a - b, 0.0, ComparisonOperator.LessThan );
+
+    public static Constraint operator <=( LinearCombination expression, double value )
       => new Constraint( expression, value, ComparisonOperator.LessThanOrEqual );
 
-    public static Constraint operator >( double value, LinearCombination expression )
-      => new Constraint( expression, value, ComparisonOperator.LessThan );
+    public static Constraint operator <=( double value, LinearCombination expression )
+      => new Constraint( expression, value, ComparisonOperator.GreaterThanOrEqual );
 
     public static Constraint operator <=( LinearCombination a, LinearCombination b )
       => new Constraint( a - b, 0.0, ComparisonOperator.LessThanOrEqual );
 
-    public static Constraint operator <( LinearCombination a, LinearCombination b )
-      => new Constraint( a - b, 0.0, ComparisonOperator.LessThan );
+    public static Constraint operator >( LinearCombination expression, double value )
+      => new Constraint( expression, value, ComparisonOperator.GreaterThan );
 
-    public static Constraint operator >=( LinearCombination a, LinearCombination b )
-      => new Constraint( a - b, 0.0, ComparisonOperator.GreaterThanOrEqual );
+    public static Constraint operator >( double value, LinearCombination expression )
+      => new Constraint( expression, value, ComparisonOperator.LessThan );
 
     public static Constraint operator >( LinearCombination a, LinearCombination b )
       => new Constraint( a - b, 0.0, ComparisonOperator.GreaterThan );
 
-    public bool IsConstant => this.terms.All( kvp => kvp.Value == 0.0 );
+    public static Constraint operator >=( LinearCombination expression, double value )
+      => new Constraint( expression, value, ComparisonOperator.GreaterThanOrEqual );
 
-    public bool IsZero => this.terms.All( kvp => kvp.Value == 0.0 ) && ( this.constant == 0.0 );
+    public static Constraint operator >=( double value, LinearCombination expression )
+      => new Constraint( expression, value, ComparisonOperator.LessThanOrEqual );
 
-    public bool HasSingleVariable => this.terms.Count == 1;
+    public static Constraint operator >=( LinearCombination a, LinearCombination b )
+      => new Constraint( a - b, 0.0, ComparisonOperator.GreaterThanOrEqual );
 
-    public double Constant => this.constant;
+    public bool Equals( LinearCombination? other )
+    {
+      // We are not null, so if other is null we are not the same.
+      if( ReferenceEquals( null, other ) )
+      {
+        return false;
+      }
+
+      // If we are literally the same object, we are the same.
+      if( ReferenceEquals( this, other ) )
+      {
+        return true;
+      }
+
+      // We cannot be the same if we have different constants or not the same number of terms.
+      if( ( this.constant != other.constant ) || ( this.coefficients.Count != other.coefficients.Count ) )
+      {
+        return false;
+      }
+
+      // We checked that our constants match. If we are both constant, we must be the same.
+      if( this.IsConstant && other.IsConstant )
+      {
+        return true;
+      }
+
+      // Do the expensive comparison: are all my terms equal to theirs and vice versa?
+      return this.coefficients.All( t => other.coefficients.GetValueOrDefault( t.Key ) == t.Value )
+        && other.coefficients.All( t => this.coefficients.GetValueOrDefault( t.Key ) == t.Value );
+    }
 
     public override string ToString()
     {
@@ -153,7 +190,7 @@ namespace Talumis.LpSolver
       }
 
       StringBuilder sb = new();
-      foreach( var (variable, coefficient) in terms.OrderBy( t => t.Key.Column ) )
+      foreach( var (variable, coefficient) in coefficients.OrderBy( t => t.Key.Column ) )
       {
         if( coefficient == 0.0 )
         {
@@ -206,35 +243,17 @@ namespace Talumis.LpSolver
       return sb.ToString();
     }
 
-    public bool Equals( LinearCombination? other )
+    internal LinearCombination Add( Variable variable, double coefficient )
     {
-      // We are not null, so if other is null we are not the same.
-      if( ReferenceEquals( null, other ) )
-      {
-        return false;
-      }
-
-      // If we are literally the same object, we are the same.
-      if( ReferenceEquals( this, other ) )
-      {
-        return true;
-      }
-
-      // We cannot be the same if we have different constants or not the same number of terms.
-      if( ( this.constant != other.constant ) || ( this.terms.Count != other.terms.Count ) )
-      {
-        return false;
-      }
-
-      // We checked that our constants match. If we are both constant, we must be the same.
-      if( this.IsConstant && other.IsConstant )
-      {
-        return true;
-      }
-
-      // Do the expensive comparison: are all my terms equal to theirs and vice versa?
-      return this.terms.All( t => other.terms.GetValueOrDefault( t.Key ) == t.Value )
-        && other.terms.All( t => this.terms.GetValueOrDefault( t.Key ) == t.Value );
+      this.coefficients.TryAdd( variable, 0.0 );
+      this.coefficients[ variable ] += coefficient;
+      return this;
     }
+
+    public bool Equals( Variable? variable )
+      => ( variable != null )
+        && ( this.constant == 0.0 )
+        && ( this.HasSingleVariable )
+        && this.coefficients.GetValueOrDefault( variable ) == 1.0;
   }
 }
